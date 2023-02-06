@@ -24,22 +24,27 @@ def lambda_i(s):
 # Transition functions
 # The idea here is to make everything easy to change by changing only these functions.
 # For f
+#d0 = d2, d1 =  d1, b0 = r0
+
 def fb0(s,p):
     return p['b0']
 def fd0(s,p):
-    return -p['d0']*s['N']/p['Nc']
+    return -p['d0']*s['N']/p['Sc']
+def fd1(s,p):
+    return 0.001
+
 def f(n,s,p):
     '''Transition function for dN/dt. n is the microscopic variables.
     s are state variables, call S, N
     p are parameters, call b0, d0, Nc '''
-    return (fb0(s,p)+fd0(s,p)*n)*n
+    return fb0(s,p) * n - fd1(s,p) * n**2 - fd0(s,p) * n
 
 # Also need derivatives for lambda dynamics. Note that these have to be manually editted for alternate f,h,q
 def dfdt(n,s,p,ds):
-    return fd0(s,p)/s['N']*ds['dN']*n*n
+    return -1 * fd0(s,p)/s['N']*ds['dN']*n
 
 def dfdd(n, s, p):
-    return 2*n*fd0(s,p)
+    return n*s['N']/p['Sc']
 
 def dfdd_sum(l,s,p,z):
     nrange = np.arange(s['N'])+1
