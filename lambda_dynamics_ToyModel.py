@@ -138,7 +138,7 @@ def iterate(t,s,p,dt=0.2,l=np.array([]),ds=np.array([]), d_d = None, verbose = T
             dl_mat_new, dl_vec_new = get_new_dl_matrix_vector(ld[i],sd.iloc[i],p,dsd.iloc[i], d_d)
             dl_new = linalg.solve(dl_mat_new, dl_vec_new)
             #print(dl_new, dl)
-            dl = dl_new
+            #dl = dl_new
             #print(dl * dt)
 
         # Now update state variables

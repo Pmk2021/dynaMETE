@@ -29,7 +29,7 @@ def lambda_i(s):
 def fb0(s,p):
     return p['b0']
 def fd0(s,p):
-    return -p['d0']*s['N']/p['Sc']
+    return p['d0']*s['N']/p['Sc']
 def fd1(s,p):
     return 0.001
 
