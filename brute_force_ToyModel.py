@@ -35,7 +35,7 @@ def constraints(l,s,p,ds):
 
 
 
-def iterate(t,s0,p,delta_D,dt,l0=np.array([]), ds0=np.array([]), verbose=False):
+def iterate(t,s0,p,new_N,dt,l0=np.array([]), ds0=np.array([]), verbose=False):
     '''
     This function will iterate DynaMETE t steps. Returns vectors of lambdas, state variables, and time derivatives.
     1. Update state variables using time derivatives
@@ -61,7 +61,7 @@ def iterate(t,s0,p,delta_D,dt,l0=np.array([]), ds0=np.array([]), verbose=False):
     lambdas = np.zeros([t+1,2])
     states = pd.DataFrame(np.zeros([t+1,2]),columns=['S','N'])
     dstates = pd.DataFrame(np.zeros([t+1,2]),columns=['dS','dN'])
-
+    updated = False
     # Initialize zeroth element
     # Copy if present
     if bool(l0.size):
@@ -84,6 +84,10 @@ def iterate(t,s0,p,delta_D,dt,l0=np.array([]), ds0=np.array([]), verbose=False):
 
         # First update state variables with time derivatives, multiplied by how much of one year we want to step by
         states.iloc[i+1] = states.iloc[i] + dt*dstates.iloc[i].values
+        if(updated == False):
+            if(states.iloc[i]['N'] != new_N):
+                states.iloc[i+1]['N'] = new_N
+            updated = True
         # Update derivatives from means over f and h
         dstates.iloc[i+1] = rf.get_dXdt(lambdas[i],states.iloc[i+1],p)
 
