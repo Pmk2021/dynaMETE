@@ -88,7 +88,16 @@ def iterate(t,s0,p,new_N,dt,l0=np.array([]), ds0=np.array([]), verbose=False):
             if(states.iloc[i]['N'] != new_N):
                 states.iloc[i+1]['N'] = new_N
             updated = True
+            for pl in range(100):
+                dstates.iloc[i+1] = rf.get_dXdt(lambdas[i],states.iloc[i+1],p)
+                # Now time for new lambdas. Use old l as starting point, new s and ds
+                l = fsolve(constraints,lambdas[i]+0.00001,args=(states.iloc[i+1],p,dstates.iloc[i+1]))
+                print(l, dstates.iloc[i+1])
+                #print(l,j)
+                lambdas[i] = l
+            
         # Update derivatives from means over f and h
+        
         dstates.iloc[i+1] = rf.get_dXdt(lambdas[i],states.iloc[i+1],p)
 
         # Now time for new lambdas. Use old l as starting point, new s and ds
