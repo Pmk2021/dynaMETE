@@ -31,7 +31,7 @@ def fb0(s,p):
 def fd0(s,p):
     return p['d0']*s['N']/p['Nc']
 def fd1(s,p):
-    return 0.001
+    return p['d1']
 
 def f(n,s,p):
     '''Transition function for dN/dt. n is the microscopic variables.
