@@ -24,27 +24,42 @@ def lambda_i(s):
 # Transition functions
 # The idea here is to make everything easy to change by changing only these functions.
 # For f
-#d0 = d2, d1 =  d1, b0 = r0
+# d0 = d2, d1 =  d1, b0 = r0
 
 def fb0(s,p):
     return p['b0']
-def fd0(s,p):
-    return p['d0']*s['N']/p['Nc']
+def fd0(s,p): # this one is d2
+    return 0.02 * s['N']/p['Nc'] # - unperturbed (last parts need to be part of formula)
+    # return p['d0']*s['N']/p['Nc'] - perturbed?
 def fd1(s,p):
+    # return 0.02 - unperturbed (0.001 originally)
     return p['d1']
 
+# Nearly identical to dN/dt
+# Last term is N/N0 * d0 * n^2 in code (fd0(s, p) returns p['d0'] * s['N'] / p['Nc'])
 def f(n,s,p):
     '''Transition function for dN/dt. n is the microscopic variables.
     s are state variables, call S, N
     p are parameters, call b0, d0, Nc '''
+
+    # d1*n*N/N0 in the code/Excel. And in the manuscript it d1*n*N/S_0 (from Pranav)
+    # f(n, N) = b0 (birth rate) * n - d1 * n**2 - p['d2'] (d0) * n**2 * N/s (in draft)
+    # f(n, N) = b0 (birth rate) * n - fd1(s, p) * n ** 2 - N/N0 * p['d2'] * n^2 (in code)
+    # Not an issue: N0 and S0 are constants
     return fb0(s,p) * n - fd1(s,p) * n**2 - fd0(s,p) * n
+    # fd1 proportional to n squared- increase number of people, competition increases quadratically
+    #    - animals are killing each other and stuff
+    #    - interspecies competition
+    # fd0- related to like. natural death rate for 1 species
+    # kinda similar to logistic equation; lower bound, upper bound in ecosystem (not below 0, carrying capacity)
 
 # Also need derivatives for lambda dynamics. Note that these have to be manually editted for alternate f,h,q
 def dfdt(n,s,p,ds):
     return -1 * fd0(s,p)/s['N']*ds['dN']*n
 
 def dfdd(n, s, p):
-    return n*s['N']/p['Sc']
+    # return n*s['N']/p['Sc'] - for perturb d0
+    return - n ** 2
 
 def dfdd_sum(l,s,p,z):
     nrange = np.arange(s['N'])+1
@@ -133,7 +148,7 @@ def mean(func,l,s,p,*args,z=1):
     z is the normalization
     l are lambdas
     s are state variables, call S, N
-    p are parameters, call b0, d0, Nc
+    p are parameters, call b0, d0, d1, Nc
     '''
     nrange = np.arange(s['N'])+1
     # Below is to make this easier for lambda functions, but it isn't worth it. Just require s and p passed, 

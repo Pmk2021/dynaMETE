@@ -45,7 +45,7 @@ def get_dl_matrix_vector(l,s,p,ds):
 
 
 
-##Return analytically derived D_Lambdas in form DLambda1, Dlambda2
+# Return analytically derived D_Lambdas in form DLambda1, Dlambda2 - see equations 14 and 15 in draft manuscript
 def dlambda(l,s,p,ds, prev_ds, d_d):
     cur_d = p['d0']
     p['d0'] += -1 * d_d
@@ -61,6 +61,7 @@ def dlambda(l,s,p,ds, prev_ds, d_d):
  
     D = covnn * covff - covnf * covnf
 
+    # dlambda equations DL1 and DL2 are equations 14 and 15 in the draft, which are just easier to look at
     #return (D_dndt/s['S'] - rf.cov(rf.dfdd, rf.dfdd, l,s,p,z) * d_d + l[1] * d_d * (covfdfdd - covndfdd*covff/covnf))*covnf/D
     DL1 = covnf/D * (D_dndt/s['S'] + d_d * (mean_n * s['N']/p['Nc'] + l[1] * covnn * s['N'] * covff/(covnf * p['Nc']) + l[1] * (p['b0'] * -1 * covnn * s['N']/p['Nc'] + 0.001 * covnn2 * s['N']/p['Nc'] + p['d0'] * covnn * s['N']**2 / p['Nc']**2)))
     
@@ -131,7 +132,7 @@ def iterate(t,s,p,dt=0.2,l=np.array([]),ds=np.array([]), d_d = None, verbose = T
         dsd.iloc[i+1] = rf.get_dXdt(ld[i],sd.iloc[i+1],p)
         
         if(d_d != None):
-            
+            # calculate derivative from given value
             dl1, dl2 = dlambda(ld[i],sd.iloc[i],p,dsd.iloc[i+1],dsd.iloc[i],d_d)
             
             dl = np.array([dl1,dl2]) * 1/dt 
@@ -221,6 +222,7 @@ def iterate_1(t,s,p,dt=0.2,l=np.array([]),ds=np.array([]), verbose=True):
         dsd_s_1 = rf.get_dXdt(ld[i],state_s_1,p)
         # Update lambdas
         l_s_1 = ld[i] + 1/2 * dt*dl_s_1
+
         '''Step 2'''
         dl_mat_2,dl_vec_2 = get_dl_matrix_vector(l_s_1,state_s_1,p,dsd_s_1)
         dl_s_2 = linalg.solve(dl_mat_2,dl_vec_2)
